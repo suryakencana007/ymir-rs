@@ -56,7 +56,7 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
         .init();
 
     print_logo(ctx.environment.clone(), ctx.settings.clone());
-    println!("{} {}", L::version(), ctx.settings.database.uri);
+    println!("version: {}", L::version());
 
     // LifeCycle Adapters.
     let adapters = L::adapters().await?;
