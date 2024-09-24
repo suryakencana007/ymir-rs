@@ -1,0 +1,30 @@
+[workspace]
+resolver = "2"
+members = ["."]
+
+[workspace.package]
+repository = "https://github.com/suryakencana007/ymir-rs"
+license = "MIT"
+edition = "2021"
+rust-version = "1.74"
+include = ["src/**/*", "Cargo.toml", "LICENSE*", "README"]
+
+[package]
+name = "ymir"
+version = "0.1.0"
+authors = ["Nanang Suryadi <nanang.jobs@gmail.com>"]
+description = "Core library for building scalable application using rust."
+homepage = "https://github.com/suryakencana007/ymir-rs"
+categories = ["library"]
+keywords = ["boilerplate", "library", "rest", "api"]
+repository.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+include.workspace = true
+
+[lib]
+name = "ymir"
+path = "src/lib.rs"
+
+[dependencies]
