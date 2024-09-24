@@ -4,7 +4,7 @@
 <h3>Core library for building scalable application using rust.</h3>
 
 [![crate](https://img.shields.io/crates/v/ymir.svg)](https://crates.io/crates/ymir)
-[![build status](https://github.com/suryakencana007/ymir-rs/actions/workflows/rust.yml/badge.svg)](https://github.com/suryakencana007/ymir-rs/actions/workflows/rust.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 </div>
 
