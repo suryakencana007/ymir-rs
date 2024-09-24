@@ -58,6 +58,8 @@ pub struct Server {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Secret {
+    // APP_SECRET__COOKIE
+    pub cookie: String,
     pub token_expiration: i64,
     pub cookie_expiration: i64,
 }
@@ -68,12 +70,8 @@ pub struct Settings {
     pub server: Server,
     pub database: Database,
     pub logger: Logger,
-    // pub email: EmailSettings,
     pub frontend_url: String,
-    // pub interval_of_coin_update: u64,
-    // pub superuser: SuperUser,
     pub secret: Secret,
-    // pub coingecko: CoinGeckoSettings,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]

@@ -11,7 +11,7 @@ include = ["src/**/*", "Cargo.toml", "LICENSE*", "README.md"]
 
 [package]
 name = "ymir"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Nanang Suryadi <nanang.jobs@gmail.com>"]
 description = "Core library for building scalable application using rust."
 homepage = "https://github.com/suryakencana007/ymir-rs"
@@ -31,6 +31,7 @@ path = "src/lib.rs"
 argon2 = "0.5.3"
 async-trait = "0.1.82"
 axum = { version = "0.7.6", features = ["macros", "tracing"] }
+axum-extra = { version = "0.9.4", features = ["cookie", "cookie-private"] }
 byte-unit = "5.1.4"
 colored = "2.1.0"
 config = { version = "0.14.0", features = ["yaml"] }

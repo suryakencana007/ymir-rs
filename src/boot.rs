@@ -21,6 +21,7 @@ pub async fn make_context() -> Result<Context> {
 
     let settings = get_settings(&environment).expect("Failed to read settings.");
     Ok(Context {
+        key: axum_extra::extract::cookie::Key::from(settings.clone().secret.cookie.as_bytes()),
         environment: environment.clone(),
         settings,
         db: None,

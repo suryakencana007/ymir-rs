@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 
 use async_trait::async_trait;
-use axum::Router;
+use axum::{extract::FromRef, Router};
 use sea_orm::DatabaseConnection;
 
 use crate::{
@@ -13,12 +13,20 @@ use crate::{
 
 #[derive(Clone)]
 pub struct Context {
+    /// Enables the PrivateCookieJar extractor
+    pub key: axum_extra::extract::cookie::Key,
     /// The environment in which the application is running.
     pub environment: Environment,
     /// Settings for the application.
     pub settings: Settings,
     /// A database connection used by the application.
     pub db: Option<DatabaseConnection>,
+}
+
+impl FromRef<Context> for axum_extra::extract::cookie::Key {
+    fn from_ref(state: &Context) -> Self {
+        state.key.clone()
+    }
 }
 
 #[async_trait]
