@@ -7,7 +7,7 @@ use crate::{
 };
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-const MODULE_WHITELIST: &[&str] = &["ymir-rs", "tower_http", "axum::rejection", "sqlx"];
+const MODULE_WHITELIST: &[&str] = &["ymir", "tower_http", "axum::rejection", "sqlx"];
 
 pub async fn make_context() -> Result<Context> {
     dotenv::dotenv().ok();
