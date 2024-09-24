@@ -15,7 +15,7 @@ version = "0.1.0"
 authors = ["Nanang Suryadi <nanang.jobs@gmail.com>"]
 description = "Core library for building scalable application using rust."
 homepage = "https://github.com/suryakencana007/ymir-rs"
-categories = ["library"]
+categories = ["development-tools", "web-programming"]
 keywords = ["boilerplate", "library", "rest", "api"]
 repository.workspace = true
 license.workspace = true
@@ -38,13 +38,28 @@ dotenv = "0.15.0"
 lazy_static = "1.5.0"
 regex = "1.10.6"
 rusty_ulid = { version = "2.0.0", features = ["rand", "chrono", "serde"] }
-sea-orm = { version = "1.0.1", features = ["sqlx-postgres", "runtime-tokio", "macros"] }
+sea-orm = { version = "1.0.1", features = [
+    "sqlx-postgres",
+    "runtime-tokio",
+    "macros",
+] }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
 thiserror = "1.0.64"
-tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread", "signal"] }
+tokio = { version = "1.40.0", features = [
+    "macros",
+    "rt-multi-thread",
+    "signal",
+] }
 tower = { version = "0.5.1", features = ["util"] }
-tower-http = { version = "0.6.1", features = ["compression-full", "cors", "fs", "set-header", "timeout", "trace"] }
+tower-http = { version = "0.6.1", features = [
+    "compression-full",
+    "cors",
+    "fs",
+    "set-header",
+    "timeout",
+    "trace",
+] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 
