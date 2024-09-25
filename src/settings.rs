@@ -1,4 +1,25 @@
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
+
+/// Redis Configuration
+///
+/// Example (development):
+/// ```yaml
+/// # config/development.yaml
+/// redis:
+///   uri: redis://127.0.0.1/
+///   dangerously_flush: false
+/// ```
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Redis {
+    /// The URI for connecting to the Redis server. For example:
+    /// <redis://127.0.0.1/>
+    pub uri: String,
+    #[serde(default)]
+    /// Flush redis when application loaded. Useful for `test`.
+    pub dangerously_flush: bool,
+}
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Database {
@@ -69,9 +90,24 @@ pub struct Secret {
 pub struct Settings {
     pub server: Server,
     pub database: Database,
+    pub cache: Option<Redis>,
     pub logger: Logger,
     pub frontend_url: String,
     pub secret: Secret,
+    pub adapters: Option<Adapters>,
+    /// Custom app configurations
+    ///
+    /// Example:
+    /// ```yaml
+    /// configurations:
+    ///   jwt:
+    ///     secret: xxxxx
+    ///     expiration: 10
+    /// ```
+    /// And then optionally deserialize it to your own `Configurations` type by
+    /// accessing `ctx.settings.configurations`.
+    #[serde(default)]
+    pub configurations: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
@@ -136,6 +172,20 @@ pub struct LimitPayloadMiddleware {
     /// Body limit. for example: 5mb
     pub body_limit: String,
 }
+
+/// Adapters configuration
+///
+/// Example (development): To configure settings for oauth2 or custom view
+/// engine
+/// ```yaml
+/// # config/development.yaml
+/// adapters:
+///  oauth2:
+///   authorization_code: # Authorization code grant type
+///     - client_identifier: google # Identifier for the `OAuth2` provider.
+///       Replace 'google' with your provider's name if different, must be
+///       unique within the oauth2 config. ... # other fields
+pub type Adapters = BTreeMap<String, serde_json::Value>;
 
 /// Static asset middleware configuration
 #[derive(Debug, Clone, Deserialize, Serialize)]
