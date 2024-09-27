@@ -15,6 +15,12 @@ pub enum Error {
     Axum(#[from] axum::http::Error),
 
     #[error(transparent)]
+    PasswordHashError(#[from] argon2::password_hash::Error),
+
+    #[error(transparent)]
+    UlidError(#[from] rusty_ulid::DecodingError),
+
+    #[error(transparent)]
     JSON(serde_json::Error),
 
     #[error(transparent)]
@@ -26,19 +32,25 @@ pub enum Error {
     #[error(transparent)]
     DB(#[from] sea_orm::DbErr),
 
+    #[error(transparent)]
+    RedisPool(#[from] bb8::RunError<sidekiq::RedisError>),
+
+    #[error(transparent)]
+    Redis(#[from] sidekiq::redis_rs::RedisError),
+
     // API
     #[error("{0}")]
     Unauthorized(String),
 
     // API
-    #[error("not found")]
-    NotFound,
+    #[error("{0}")]
+    NotFound(String),
 
     #[error("{0}")]
     BadRequest(String),
 
-    #[error("internal server error")]
-    InternalServerError,
+    #[error("{0}")]
+    InternalServerError(String),
 
     #[error(transparent)]
     InvalidHeaderValue(#[from] InvalidHeaderValue),

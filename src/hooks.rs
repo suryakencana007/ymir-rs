@@ -6,6 +6,7 @@ use sea_orm::DatabaseConnection;
 
 use crate::{
     adapter::Adapter,
+    job::{Pool, Processor, RedisConnectionManager},
     rest::ports::shutdown_signal,
     settings::{Environment, Settings},
     Result,
@@ -21,6 +22,8 @@ pub struct Context {
     pub settings: Settings,
     /// A database connection used by the application.
     pub db: Option<DatabaseConnection>,
+    /// A worker tasks
+    pub queue: Option<Pool<RedisConnectionManager>>,
 }
 
 impl FromRef<Context> for axum_extra::extract::cookie::Key {
@@ -67,9 +70,13 @@ pub trait LifeCycle {
         Ok(())
     }
 
+    /// Register external adapters to the application.
     async fn adapters() -> Result<Vec<Box<dyn Adapter>>> {
         Ok(vec![])
     }
+
+    /// Run all custom job runner.
+    fn job_runners<'a>(p: &'a mut Processor, ctx: &'a Context);
 
     /// Router
     fn routes(app: Router<Context>) -> Router<Context>;

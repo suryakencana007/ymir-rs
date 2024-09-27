@@ -1,8 +1,9 @@
 use crate::{
+    adapter::ReturnAdapter,
     hooks::{Context, LifeCycle},
     logo::print_logo,
     rest::ports,
-    settings::{get_settings, Environment},
+    settings::{self, Environment},
     Result,
 };
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -19,18 +20,19 @@ pub async fn make_context() -> Result<Context> {
         .try_into()
         .expect("Failed to parse APP_ENVIRONMENT.");
 
-    let settings = get_settings(&environment).expect("Failed to read settings.");
+    let settings = settings::get_settings(&environment).expect("Failed to read settings.");
     Ok(Context {
         key: axum_extra::extract::cookie::Key::from(settings.clone().secret.cookie.as_bytes()),
         environment: environment.clone(),
         settings,
         db: None,
+        queue: None,
     })
 }
 
 pub async fn start<L: LifeCycle>() -> Result<()> {
     // create context
-    let mut ctx = make_context().await?;
+    let ctx = make_context().await?;
     let logger = ctx.settings.logger.clone();
     let level = logger
         .enable
@@ -59,11 +61,7 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
     println!("version: {}", L::version());
 
     // LifeCycle Adapters.
-    let adapters = L::adapters().await?;
-    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
-    for adapter in &adapters {
-        ctx = adapter.before_run(ctx.clone()).await?;
-    }
+    let ReturnAdapter { ctx, adapters } = start_adapters::<L>(ctx.clone()).await?;
 
     // ports http serve
     ports::serve::<L>(ctx.clone()).await?;
@@ -73,4 +71,15 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
     }
     tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters stoped");
     Ok(())
+}
+
+pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdapter> {
+    let adapters = L::adapters().await?;
+    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
+
+    // register internal adapter
+    for adapter in &adapters {
+        ctx = adapter.before_run(ctx.clone()).await?;
+    }
+    Ok(ReturnAdapter { ctx, adapters })
 }

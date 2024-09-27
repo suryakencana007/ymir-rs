@@ -6,16 +6,13 @@ use axum::{
 use rusty_ulid::Ulid;
 use serde::Serialize;
 
-use super::errors::ErrorIssuer;
+use crate::errors::Error;
 
-#[derive(FromRequest)]
-#[from_request(via(axum::Json), rejection(ErrorIssuer))]
-pub struct JsonResponse<T>(pub T);
+#[derive(Debug, FromRequest)]
+#[from_request(via(axum::Json), rejection(Error))]
+pub struct Json<T>(pub T);
 
-impl<T> IntoResponse for JsonResponse<T>
-where
-    axum::Json<T>: IntoResponse,
-{
+impl<T: Serialize> IntoResponse for Json<T> {
     fn into_response(self) -> Response {
         axum::Json(self.0).into_response()
     }
