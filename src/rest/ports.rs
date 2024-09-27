@@ -9,16 +9,16 @@ use crate::{
     Result,
 };
 
-use super::middlewares::serve_http;
+use super::{health, middlewares::serve_http};
 
 pub async fn serve<L: LifeCycle>(ctx: Context) -> Result<()> {
     let settings = ctx.settings.clone();
     // build our application with a route
     let mut app = axum::Router::new();
-    app = L::routes(app)
+    app = L::routes(app.clone())
+        .merge(health::register_handler(app))
         // .with_state(app_state.clone())
         .layer(tower_http::trace::TraceLayer::new_for_http());
-
     app = serve_http(ctx.clone(), app);
 
     // Static Assets
