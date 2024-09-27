@@ -75,9 +75,9 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
 
 pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdapter> {
     let mut adapters = L::adapters().await?;
-    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
     // register internal adapter
     adapters.push(Box::new(QueueEngineAdapter));
+    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
     for adapter in &adapters {
         ctx = adapter.before_run(ctx.clone()).await?;
     }
