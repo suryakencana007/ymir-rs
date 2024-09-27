@@ -1,5 +1,5 @@
 use crate::{
-    adapter::ReturnAdapter,
+    adapter::{QueueEngineAdapter, ReturnAdapter},
     hooks::{Context, LifeCycle},
     logo::print_logo,
     rest::ports,
@@ -74,10 +74,10 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
 }
 
 pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdapter> {
-    let adapters = L::adapters().await?;
+    let mut adapters = L::adapters().await?;
     tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
-
     // register internal adapter
+    adapters.push(Box::new(QueueEngineAdapter));
     for adapter in &adapters {
         ctx = adapter.before_run(ctx.clone()).await?;
     }
