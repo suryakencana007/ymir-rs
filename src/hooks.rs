@@ -79,5 +79,5 @@ pub trait LifeCycle {
     fn job_runners<'a>(p: &'a mut Processor, ctx: &'a Context);
 
     /// Router
-    fn routes() -> Router;
+    fn routes(ctx: Context) -> Router;
 }

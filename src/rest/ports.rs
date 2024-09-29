@@ -15,7 +15,7 @@ pub async fn serve<L: LifeCycle>(ctx: Context) -> Result<()> {
     let settings = ctx.settings.clone();
     // build our application with a route
     let mut app = axum::Router::new()
-        .merge(L::routes())
+        .merge(L::routes(ctx.clone()))
         .merge(health::register_handler(ctx.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http());
     app = serve_http(ctx.clone(), app.clone());
