@@ -80,4 +80,9 @@ pub trait LifeCycle {
 
     /// Router
     fn routes(app: Router<Context>) -> Router<Context>;
+
+    /// Assign Context State.
+    fn assign_state(ctx: Context, app: Router<Context>) -> Router {
+        app.with_state(ctx.clone())
+    }
 }

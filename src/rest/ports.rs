@@ -51,9 +51,8 @@ pub async fn serve<L: LifeCycle>(ctx: Context) -> Result<()> {
             },
         )
     }
-
-    let app = app.with_state(ctx.clone());
-    L::rest(ctx, app).await?;
+    let app = L::assign_state(ctx.clone(), app);
+    L::rest(ctx.clone(), app).await?;
     Ok(())
 }
 
