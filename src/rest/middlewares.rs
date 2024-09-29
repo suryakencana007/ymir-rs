@@ -18,7 +18,7 @@ lazy_static! {
         http::header::HeaderValue::from_static("butter");
 }
 
-pub fn serve_http(ctx: Context, mut router: Router<Context>) -> Router<Context> {
+pub fn serve_http(ctx: Context, mut router: Router) -> Router {
     let settings = ctx.settings.clone();
     // CORS Middleware
     if let Some(cors) = settings

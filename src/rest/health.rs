@@ -49,7 +49,9 @@ async fn redis_ping(pool: &Pool<RedisConnectionManager>) -> Result<()> {
         .await?)
 }
 
-pub fn register_handler(app: Router<Context>) -> Router<Context> {
+pub fn register_handler(ctx: Context) -> Router {
+    let app = Router::new();
     app.route("/_ping", get(ping))
         .route("/_health", get(health))
+        .with_state(ctx)
 }

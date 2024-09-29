@@ -79,10 +79,5 @@ pub trait LifeCycle {
     fn job_runners<'a>(p: &'a mut Processor, ctx: &'a Context);
 
     /// Router
-    fn routes(app: Router<Context>) -> Router<Context>;
-
-    /// Assign Context State.
-    fn assign_state(ctx: Context, app: Router<Context>) -> Router {
-        app.with_state(ctx.clone())
-    }
+    fn routes() -> Router;
 }

@@ -14,12 +14,11 @@ use super::{health, middlewares::serve_http};
 pub async fn serve<L: LifeCycle>(ctx: Context) -> Result<()> {
     let settings = ctx.settings.clone();
     // build our application with a route
-    let mut app = axum::Router::new();
-    app = L::routes(app.clone())
-        .merge(health::register_handler(app))
-        // .with_state(app_state.clone())
+    let mut app = axum::Router::new()
+        .merge(L::routes())
+        .merge(health::register_handler(ctx.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http());
-    app = serve_http(ctx.clone(), app);
+    app = serve_http(ctx.clone(), app.clone());
 
     // Static Assets
     if let Some(assets) = settings
@@ -51,7 +50,6 @@ pub async fn serve<L: LifeCycle>(ctx: Context) -> Result<()> {
             },
         )
     }
-    let app = L::assign_state(ctx.clone(), app);
     L::rest(ctx.clone(), app).await?;
     Ok(())
 }
