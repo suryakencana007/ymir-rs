@@ -63,9 +63,13 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
     // LifeCycle Adapters.
     let ReturnAdapter { ctx, adapters } = start_adapters::<L>(ctx.clone()).await?;
 
+    // make router
+    let mut router = ports::build_routes::<L>(&ctx).await?;
+    for adapter in &adapters {
+        router = adapter.after_route(&ctx, router).await?;
+    }
     // ports http serve
-    ports::serve::<L>(ctx.clone()).await?;
-
+    ports::serve::<L>(&ctx, router).await?;
     for adapter in &adapters {
         adapter.after_stop(ctx.clone()).await?;
     }
@@ -79,7 +83,7 @@ pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdap
     adapters.push(Box::new(QueueEngineAdapter));
     tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
     for adapter in &adapters {
-        ctx = adapter.before_run(ctx.clone()).await?;
+        ctx = adapter.before_run(ctx).await?;
     }
     Ok(ReturnAdapter { ctx, adapters })
 }

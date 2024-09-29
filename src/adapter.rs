@@ -4,6 +4,7 @@ use crate::{
     Result,
 };
 use async_trait::async_trait;
+use axum::Router;
 
 pub struct ReturnAdapter {
     pub ctx: Context,
@@ -17,6 +18,10 @@ pub trait Adapter: Sync + Send {
 
     async fn before_run(&self, ctx: Context) -> Result<Context> {
         Ok(ctx)
+    }
+
+    async fn after_route(&self, _ctx: &Context, router: Router) -> Result<Router> {
+        Ok(router)
     }
 
     async fn after_stop(&self, _ctx: Context) -> Result<()> {

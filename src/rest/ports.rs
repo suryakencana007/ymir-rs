@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use axum::Router;
 use tokio::signal;
 use tower_http::services::{ServeDir, ServeFile};
 
@@ -11,7 +12,11 @@ use crate::{
 
 use super::{health, middlewares::serve_http};
 
-pub async fn serve<L: LifeCycle>(ctx: Context) -> Result<()> {
+pub async fn serve<L: LifeCycle>(ctx: &Context, router: Router) -> Result<()> {
+    L::rest(ctx, router).await
+}
+
+pub async fn build_routes<L: LifeCycle>(ctx: &Context) -> Result<Router> {
     let settings = ctx.settings.clone();
     // build our application with a route
     let mut app = axum::Router::new()
@@ -50,8 +55,8 @@ pub async fn serve<L: LifeCycle>(ctx: Context) -> Result<()> {
             },
         )
     }
-    L::rest(ctx.clone(), app).await?;
-    Ok(())
+    // L::rest(ctx.clone(), app).await?;
+    Ok(app)
 }
 
 pub async fn shutdown_signal() {

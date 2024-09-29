@@ -53,7 +53,7 @@ pub trait LifeCycle {
     ///
     /// # Returns
     /// A Result indicating success () or an error if the server fails to start.
-    async fn rest(ctx: Context, app: Router) -> Result<()> {
+    async fn rest(ctx: &Context, app: Router) -> Result<()> {
         let settings = ctx.settings.clone();
         let address = format!("{}:{}", settings.server.host, settings.server.port);
 
