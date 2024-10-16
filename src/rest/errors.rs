@@ -7,13 +7,6 @@ use serde::Serialize;
 
 use crate::rest::responses::Json;
 
-pub enum ContextError {
-    UnauthorizedAccess,
-    InternalServerError,
-    BadRequest,
-    NotFound,
-}
-
 impl IntoResponse for crate::errors::Error {
     fn into_response(self) -> Response {
         #[derive(Serialize)]

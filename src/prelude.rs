@@ -17,5 +17,6 @@ pub use crate::{
     errors::Error,
     hooks::{Context, LifeCycle},
     job::{self, Jobs},
+    state::{Inject, InjectState},
     Result,
 };
