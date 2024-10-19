@@ -1,17 +1,7 @@
 use axum::response::{Html, IntoResponse, Redirect, Response};
-use responses::Json;
 use serde::Serialize;
 
-use crate::Result;
-
-pub mod cors;
-pub mod errors;
-pub mod health;
-pub mod middlewares;
-pub mod pagination;
-pub mod ports;
-pub mod request_id;
-pub mod responses;
+use crate::{responses::Json, Result};
 
 /// # Errors
 ///

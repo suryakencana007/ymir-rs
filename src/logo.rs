@@ -1,6 +1,6 @@
 use colored::Colorize;
 
-use crate::settings::Environment;
+use crate::config::Environment;
 
 pub const LOGO: &str = r"
 #####################################
@@ -22,7 +22,7 @@ pub const LOGO: &str = r"
 #####################################
 ";
 
-pub fn print_logo(environment: Environment, settings: crate::settings::Settings) {
+pub fn print_logo(environment: Environment, configs: crate::config::Config) {
     println!("{}", LOGO.bright_red());
 
     println!("environment: {}", environment.as_str().bright_magenta());
@@ -31,8 +31,8 @@ pub fn print_logo(environment: Environment, settings: crate::settings::Settings)
 
     worker_line.push(format!(
         "listening on {}:{}",
-        settings.server.host.green(),
-        settings.server.port.to_string().bright_magenta()
+        configs.server.host.green(),
+        configs.server.port.to_string().bright_magenta()
     ));
 
     println!();

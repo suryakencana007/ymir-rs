@@ -1,12 +1,13 @@
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
 use crate::{
-    adapter::{QueueEngineAdapter, ReturnAdapter},
-    hooks::{Context, LifeCycle},
+    adapter::ReturnAdapter,
+    config::{load_configuration, Environment},
+    context::Context,
+    hooks::{self, LifeCycle},
     logo::print_logo,
-    rest::ports,
-    settings::{self, Environment},
     Result,
 };
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 const MODULE_WHITELIST: &[&str] = &["ymir", "tower_http", "axum::rejection", "sqlx"];
 
@@ -20,20 +21,27 @@ pub async fn make_context() -> Result<Context> {
         .try_into()
         .expect("Failed to parse APP_ENVIRONMENT.");
 
-    let settings = settings::get_settings(&environment).expect("Failed to read settings.");
+    let configs = load_configuration(&environment).expect("Failed to read configurations.");
+
     Ok(Context {
-        key: axum_extra::extract::cookie::Key::from(settings.clone().secret.cookie.as_bytes()),
         environment: environment.clone(),
-        settings,
-        db: None,
-        queue: None,
+        configs,
     })
+}
+
+pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdapter> {
+    let adapters = L::adapters().await?;
+    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
+    for adapter in &adapters {
+        ctx = adapter.before_run(ctx).await?;
+    }
+    Ok(ReturnAdapter { ctx, adapters })
 }
 
 pub async fn start<L: LifeCycle>() -> Result<()> {
     // create context
     let ctx = make_context().await?;
-    let logger = ctx.settings.logger.clone();
+    let logger = ctx.configs.logger.clone();
     let level = logger
         .enable
         .then(|| logger.level)
@@ -57,33 +65,22 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    print_logo(ctx.environment.clone(), ctx.settings.clone());
+    print_logo(ctx.environment.clone(), ctx.configs.clone());
     println!("version: {}", L::version());
 
     // LifeCycle Adapters.
     let ReturnAdapter { ctx, adapters } = start_adapters::<L>(ctx.clone()).await?;
 
     // make router
-    let mut router = ports::build_routes::<L>(&ctx).await?;
+    let mut router = hooks::build_routes::<L>(&ctx).await?;
     for adapter in &adapters {
         router = adapter.after_route(&ctx, router).await?;
     }
     // ports http serve
-    ports::serve::<L>(&ctx, router).await?;
+    hooks::serve::<L>(&ctx, router).await?;
     for adapter in &adapters {
         adapter.after_stop(ctx.clone()).await?;
     }
     tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters stoped");
     Ok(())
-}
-
-pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdapter> {
-    let mut adapters = L::adapters().await?;
-    // register internal adapter
-    adapters.push(Box::new(QueueEngineAdapter));
-    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
-    for adapter in &adapters {
-        ctx = adapter.before_run(ctx).await?;
-    }
-    Ok(ReturnAdapter { ctx, adapters })
 }

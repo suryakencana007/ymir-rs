@@ -1,7 +1,7 @@
-use axum::{extract::Request, http::HeaderValue, middleware::Next, response::Response};
+use axum::{extract::Request, middleware::Next, response::Response};
+use http::HeaderValue;
 use lazy_static::lazy_static;
 use regex::Regex;
-use tracing::warn;
 
 #[derive(Debug, Clone)]
 pub struct RequestId(String);
@@ -31,7 +31,7 @@ pub async fn request_id_middleware(mut request: Request, next: Next) -> Response
     if let Ok(v) = HeaderValue::from_str(request_id.as_str()) {
         res.headers_mut().insert(X_REQUEST_ID, v);
     } else {
-        warn!("could not set request ID into response headers: `{request_id}`",);
+        tracing::warn!("could not set request ID into response headers: `{request_id}`",);
     }
     res
 }
@@ -49,30 +49,4 @@ fn make_request_id(maybe_request_id: Option<HeaderValue>) -> String {
             id.filter(|s| !s.is_empty())
         })
         .unwrap_or_else(|| rusty_ulid::Ulid::generate().to_string())
-}
-
-#[cfg(test)]
-mod tests {
-    use axum::http::HeaderValue;
-    use insta::assert_debug_snapshot;
-
-    use super::make_request_id;
-
-    #[test]
-    fn create_or_fetch_request_id() {
-        let id = make_request_id(Some(HeaderValue::from_static("foo-bar=baz")));
-        assert_debug_snapshot!(id);
-        let id = make_request_id(Some(HeaderValue::from_static("")));
-        println!("{}", id);
-        assert_debug_snapshot!(id.len());
-        let id = make_request_id(Some(HeaderValue::from_static("==========")));
-        println!("{}", id);
-        assert_debug_snapshot!(id.len());
-        let long_id = "x".repeat(1000);
-        let id = make_request_id(Some(HeaderValue::from_str(&long_id).unwrap()));
-        println!("{}", id);
-        assert_debug_snapshot!(id.len());
-        let id = make_request_id(None);
-        assert_debug_snapshot!(id.len());
-    }
 }

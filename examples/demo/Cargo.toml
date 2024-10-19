@@ -1,0 +1,15 @@
+[package]
+name = "demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = { version = "0.7.7", features = ["macros", "tracing"] }
+tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+
+ymir = { path = "../../", version = "*" }
+
+[[bin]]
+name = "tymir"
+path = "src/bin/main.rs"
+required-features = []

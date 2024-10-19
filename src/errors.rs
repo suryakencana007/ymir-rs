@@ -4,7 +4,12 @@ use axum::{
         header::{InvalidHeaderName, InvalidHeaderValue},
         method::InvalidMethod,
     },
+    response::{IntoResponse, Response},
 };
+use http::StatusCode;
+use serde::Serialize;
+
+use crate::responses::Json;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -29,15 +34,6 @@ pub enum Error {
     #[error(transparent)]
     IO(#[from] std::io::Error),
 
-    #[error(transparent)]
-    DB(#[from] sea_orm::DbErr),
-
-    #[error(transparent)]
-    RedisPool(#[from] bb8::RunError<sidekiq::RedisError>),
-
-    #[error(transparent)]
-    Redis(#[from] sidekiq::redis_rs::RedisError),
-
     // API
     #[error("{0}")]
     Unauthorized(String),
@@ -45,6 +41,9 @@ pub enum Error {
     // API
     #[error("{0}")]
     NotFound(String),
+
+    #[error("")]
+    CustomError(StatusCode, String),
 
     #[error("{0}")]
     BadRequest(String),
@@ -76,5 +75,114 @@ impl Error {
     #[must_use]
     pub fn string(s: &str) -> Self {
         Self::Message(s.to_string())
+    }
+}
+
+#[derive(Serialize)]
+/// Structure representing details about an error.
+struct ErrorResponse {
+    message: String,
+    status_code: u16,
+}
+
+impl ErrorResponse {
+    #[must_use]
+    pub fn new<T: Into<String>>(code: StatusCode, message: T) -> Self {
+        Self {
+            message: message.into(),
+            status_code: code.as_u16(),
+        }
+    }
+}
+/// ```rust
+///
+/// async fn get_hello() -> Result<Response> {
+///     Err(Error::NotFound(msg.into()))
+/// }
+/// ````
+impl IntoResponse for Error {
+    /// Convert an `Error` into an HTTP response.
+    fn into_response(self) -> Response {
+        let (status, message) = match self {
+            Self::NotFound(error) => {
+                tracing::error!("Not Found: {}", error);
+                (
+                    StatusCode::NOT_FOUND,
+                    ErrorResponse::new(StatusCode::NOT_FOUND, error),
+                )
+            }
+            Self::InternalServerError(error) => {
+                tracing::error!("Internal server error: {}", error);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    ErrorResponse::new(StatusCode::INTERNAL_SERVER_ERROR, error),
+                )
+            }
+            Self::BadRequest(error) => {
+                tracing::warn!("Bad request: {}", error);
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(StatusCode::BAD_REQUEST, error),
+                )
+            }
+            Self::Unauthorized(error) => {
+                tracing::warn!("Unauthorized access: {}", error);
+                (
+                    StatusCode::UNAUTHORIZED,
+                    ErrorResponse::new(StatusCode::UNAUTHORIZED, error),
+                )
+            }
+            Self::JsonRejection(rejection) => {
+                tracing::error!("Bad user input: {:?}", rejection);
+                (
+                    rejection.status(),
+                    ErrorResponse::new(rejection.status(), rejection.body_text()),
+                )
+            }
+            Self::CustomError(status_code, message) => {
+                tracing::error!("Error Custome code: {status_code} {message}");
+                (status_code, ErrorResponse::new(status_code, message))
+            }
+            Self::PasswordHashError(error) => match error {
+                argon2::password_hash::Error::Password => {
+                    tracing::info!("Password mismatch error");
+                    (
+                        StatusCode::BAD_REQUEST,
+                        ErrorResponse::new(
+                            StatusCode::BAD_REQUEST,
+                            "Email and Password combination does not match.".to_string(),
+                        ),
+                    )
+                }
+                _ => {
+                    tracing::error!("Password hashing error: {}", error);
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        ErrorResponse::new(
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            "An error occurred during password processing.".to_string(),
+                        ),
+                    )
+                }
+            },
+            Self::UlidError(error) => {
+                tracing::error!("UUID error: {}", error);
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(
+                        StatusCode::BAD_REQUEST,
+                        "Invalid UUID provided.".to_string(),
+                    ),
+                )
+            }
+            _ => {
+                tracing::warn!("error: {}", self);
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(StatusCode::BAD_REQUEST, self.to_string()),
+                )
+            }
+        };
+        (status, Json(message)).into_response()
     }
 }

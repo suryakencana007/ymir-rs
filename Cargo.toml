@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["."]
+members = ["./examples/demo"]
 
 [workspace.package]
 repository = "https://github.com/suryakencana007/ymir-rs"
@@ -11,7 +11,7 @@ include = ["src/**/*", "Cargo.toml", "LICENSE*", "README.md"]
 
 [package]
 name = "ymir"
-version = "0.1.19"
+version = "0.1.20"
 authors = ["Nanang Suryadi <nanang.jobs@gmail.com>"]
 description = "Core library for building scalable application using rust."
 homepage = "https://github.com/suryakencana007/ymir-rs"
@@ -23,40 +23,26 @@ edition.workspace = true
 rust-version.workspace = true
 include.workspace = true
 
-[lib]
-name = "ymir"
-path = "src/lib.rs"
-
 [dependencies]
-argon2 = { version = "0.5.3", features = ["std"] }
-async-trait = "0.1.82"
-axum = { version = "0.7.6", features = ["macros", "tracing"] }
-axum-extra = { version = "0.9.4", features = ["cookie", "cookie-private"] }
-bb8 = "0.8.5"
-byte-unit = "5.1.4"
-colored = "2.1.0"
-config = { version = "0.14.0", features = ["yaml"] }
-dotenv = "0.15.0"
-http = "1.1.0"
-lazy_static = "1.5.0"
-regex = "1.10.6"
-rusty-sidekiq = { version = "0.10.5", default-features = false }
-rusty_ulid = { version = "2.0.0", features = ["rand", "chrono", "serde"] }
-sea-orm = { version = "1.0.1", features = [
-    "sqlx-postgres",
-    "runtime-tokio",
-    "macros",
-] }
-serde = { version = "1.0.210", features = ["derive"] }
-serde_json = "1.0.128"
-thiserror = "1.0.64"
+# async
+async-trait = "0.1.83"
 tokio = { version = "1.40.0", features = [
     "macros",
     "rt-multi-thread",
     "signal",
 ] }
+
+# serialize
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+
+# rest
+axum = { version = "0.7.7", features = ["macros", "tracing"] }
+axum-extra = { version = "0.9.4", features = ["cookie", "typed-header"] }
+http = "1.1.0"
 tower = { version = "0.5.1", features = ["util"] }
 tower-http = { version = "0.6.1", features = [
+    "catch-panic",
     "compression-full",
     "cors",
     "fs",
@@ -64,9 +50,17 @@ tower-http = { version = "0.6.1", features = [
     "timeout",
     "trace",
 ] }
-tower-layer = "0.3.3"
+
+# utils
+argon2 = { version = "0.5.3", features = ["std"] }
+byte-unit = "5.1.4"
+config = { version = "0.14.0", features = ["yaml"] }
+colored = "2.1.0"
+dotenv = "0.15.0"
+lazy_static = "1.5.0"
+regex = "1.11.0"
+rusty_ulid = { version = "2.0.0", features = ["rand", "chrono", "serde"] }
+thiserror = "1.0.64"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-
-[dev-dependencies]
-insta = { version = "1.40.0", features = ["redactions", "filters"] }
+tower-layer = "0.3.3"
