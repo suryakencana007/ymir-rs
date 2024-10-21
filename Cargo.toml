@@ -6,12 +6,12 @@ members = ["./examples/demo"]
 repository = "https://github.com/suryakencana007/ymir-rs"
 license = "MIT"
 edition = "2021"
-rust-version = "1.74"
+rust-version = "1.80.0"
 include = ["src/**/*", "Cargo.toml", "LICENSE*", "README.md"]
 
 [package]
 name = "ymir"
-version = "0.1.21"
+version = "0.1.22"
 authors = ["Nanang Suryadi <nanang.jobs@gmail.com>"]
 description = "Core library for building scalable application using rust."
 homepage = "https://github.com/suryakencana007/ymir-rs"
@@ -56,7 +56,6 @@ argon2 = { version = "0.5.3", features = ["std"] }
 byte-unit = "5.1.4"
 config = { version = "0.14.0", features = ["yaml"] }
 colored = "2.1.0"
-lazy_static = "1.5.0"
 regex = "1.11.0"
 rusty_ulid = { version = "2.0.0", features = ["rand", "chrono", "serde"] }
 thiserror = "1.0.64"

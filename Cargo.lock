@@ -2179,7 +2179,7 @@ dependencies = [
 
 [[package]]
 name = "ymir"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "argon2",
  "async-trait",
@@ -2190,7 +2190,6 @@ dependencies = [
  "config",
  "dotenvy",
  "http",
- "lazy_static",
  "regex",
  "rusty_ulid",
  "serde",

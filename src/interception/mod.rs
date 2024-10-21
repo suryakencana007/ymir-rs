@@ -1,9 +1,8 @@
 pub mod request_id;
 
-use std::time::Duration;
+use std::{sync::LazyLock, time::Duration};
 
 use axum::{response::IntoResponse, Router};
-use lazy_static::lazy_static;
 use request_id::request_id_middleware;
 use tower_http::{
     catch_panic::CatchPanicLayer, compression::CompressionLayer, cors,
@@ -12,12 +11,11 @@ use tower_http::{
 
 use crate::{config::Environment, context::Context, errors::Error, Result};
 
-lazy_static! {
-    static ref DEFAULT_IDENT_HEADER_NAME: http::header::HeaderName =
-        http::header::HeaderName::from_static("x-powered-by");
-    static ref DEFAULT_IDENT_HEADER_VALUE: http::header::HeaderValue =
-        http::header::HeaderValue::from_static("butter");
-}
+static DEFAULT_IDENT_HEADER_NAME: LazyLock<http::header::HeaderName> =
+    LazyLock::new(|| http::header::HeaderName::from_static("x-powered-by"));
+
+static DEFAULT_IDENT_HEADER_VALUE: LazyLock<http::header::HeaderValue> =
+    LazyLock::new(|| http::header::HeaderValue::from_static("butter"));
 
 pub fn interception_fn(ctx: Context, mut router: Router) -> Router {
     let cfg = ctx.configs.clone();

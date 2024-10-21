@@ -1,6 +1,7 @@
+use std::sync::LazyLock;
+
 use axum::{extract::Request, middleware::Next, response::Response};
 use http::HeaderValue;
-use lazy_static::lazy_static;
 use regex::Regex;
 
 #[derive(Debug, Clone)]
@@ -16,9 +17,8 @@ impl RequestId {
 
 const X_REQUEST_ID: &str = "x-request-id";
 const MAX_LEN: usize = 255;
-lazy_static! {
-    static ref ID_CLEANUP: Regex = Regex::new(r"[^\w\-@]").unwrap();
-}
+
+static ID_CLEANUP: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[^\w\-@]").unwrap());
 
 pub async fn request_id_middleware(mut request: Request, next: Next) -> Response {
     let header_request_id = request.headers().get(X_REQUEST_ID).cloned();
