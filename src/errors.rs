@@ -11,6 +11,12 @@ use serde::Serialize;
 
 use crate::responses::Json;
 
+impl From<serde_json::Error> for Error {
+    fn from(error: serde_json::Error) -> Self {
+        Self::JSON(error)
+    }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("{0}")]
@@ -66,11 +72,11 @@ pub enum Error {
 
 impl Error {
     pub fn wrap(err: impl std::error::Error + Send + Sync + 'static) -> Self {
-        Self::Any(Box::new(err)) //.bt()
+        Self::Any(Box::new(err))
     }
 
     pub fn msg(err: impl std::error::Error + Send + Sync + 'static) -> Self {
-        Self::Message(err.to_string()) //.bt()
+        Self::Message(err.to_string())
     }
     #[must_use]
     pub fn string(s: &str) -> Self {

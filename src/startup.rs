@@ -12,7 +12,7 @@ use crate::{
 const MODULE_WHITELIST: &[&str] = &["ymir", "tower_http", "axum::rejection", "sqlx"];
 
 pub async fn make_context() -> Result<Context> {
-    dotenv::dotenv().ok();
+    dotenvy::dotenv_override().ok();
 
     // Detect the running environment.
     // Default to `development` if unspecified.

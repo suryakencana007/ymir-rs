@@ -10,7 +10,7 @@ use tower_http::{
     set_header::SetResponseHeaderLayer, timeout::TimeoutLayer,
 };
 
-use crate::{context::Context, errors::Error, Result};
+use crate::{config::Environment, context::Context, errors::Error, Result};
 
 lazy_static! {
     static ref DEFAULT_IDENT_HEADER_NAME: http::header::HeaderName =
@@ -69,7 +69,13 @@ pub fn interception_fn(ctx: Context, mut router: Router) -> Router {
     }
 
     // catch panic
-    router = router.layer(CatchPanicLayer::custom(handle_panic));
+    match ctx.environment.clone() {
+        Environment::Development => {
+            router = router.layer(CatchPanicLayer::custom(handle_panic));
+        }
+        // TODO! Production Env.
+        Environment::Production => (),
+    }
 
     router = router.layer(SetResponseHeaderLayer::overriding(
         DEFAULT_IDENT_HEADER_NAME.clone(),
