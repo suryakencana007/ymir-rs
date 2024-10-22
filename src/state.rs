@@ -3,7 +3,6 @@ use std::{
     task::{Context, Poll},
 };
 
-use async_trait::async_trait;
 use axum::{extract::FromRequestParts, Error};
 use http::{request::Parts, Request};
 use tower::Service;
@@ -38,7 +37,6 @@ where
 #[must_use]
 pub struct Inject<T>(pub T);
 
-#[async_trait]
 impl<T, S> FromRequestParts<S> for Inject<T>
 where
     T: Clone + Send + Sync + 'static,

@@ -8,11 +8,14 @@ use serde::Serialize;
 
 use crate::errors::Error;
 
-#[derive(Debug, FromRequest)]
+#[derive(FromRequest)]
 #[from_request(via(axum::Json), rejection(Error))]
 pub struct Json<T>(pub T);
 
-impl<T: Serialize> IntoResponse for Json<T> {
+impl<T> IntoResponse for Json<T>
+where
+    axum::Json<T>: IntoResponse,
+{
     fn into_response(self) -> Response {
         axum::Json(self.0).into_response()
     }

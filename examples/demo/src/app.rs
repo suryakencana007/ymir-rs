@@ -1,4 +1,5 @@
-use axum::{async_trait, Router};
+use async_trait::async_trait;
+use axum::Router;
 use ymir::{adapter::Adapter, context::Context, hooks::LifeCycle, Result};
 
 pub struct App;
