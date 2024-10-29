@@ -547,7 +547,7 @@ dependencies = [
  "tokio",
  "tracing",
  "utoipa",
- "ymir",
+ "ymir 0.2.1",
  "ymir-openapi",
 ]
 
@@ -2306,6 +2306,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "ymir"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ff6d7928e6ae3cc35638c8d147858a52294511badc9a9a544a89f7a842b153c3"
+dependencies = [
+ "argon2",
+ "async-trait",
+ "axum",
+ "axum-extra",
+ "byte-unit",
+ "colored",
+ "config",
+ "dotenvy",
+ "http",
+ "regex",
+ "rusty_ulid",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tower-layer",
+ "tracing",
+ "tracing-subscriber",
+ "utoipa",
+]
+
+[[package]]
 name = "ymir-openapi"
 version = "0.3.0"
 dependencies = [
@@ -2314,7 +2343,7 @@ dependencies = [
  "serde",
  "serde_json",
  "utoipa",
- "ymir",
+ "ymir 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "ymir-openapi",
 ]
 
