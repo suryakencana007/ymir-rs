@@ -7,6 +7,9 @@ edition = "2021"
 async-trait = "0.1.83"
 axum = { version = "0.8.0-alpha.1", features = ["macros", "tracing"] }
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.40"
+utoipa = { version = "5.1.1", features = ["axum_extras", "macros"] }
+ymir-openapi = { path = "../../ymir-openapi", version = "*" }
 
 ymir = { path = "../../", version = "*" }
 

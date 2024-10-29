@@ -24,14 +24,15 @@ pub async fn make_context() -> Result<Context> {
     let configs = load_configuration(&environment).expect("Failed to read configurations.");
 
     Ok(Context {
-        environment: environment.clone(),
-        configs,
+        environment: Some(environment.clone()),
+        configs: Some(configs),
+        extend: Some(Box::default()),
     })
 }
 
 pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdapter> {
     let adapters = L::adapters().await?;
-    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapters loaded");
+    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapter loaded before run");
     for adapter in &adapters {
         ctx = adapter.before_run(ctx).await?;
     }
@@ -41,7 +42,8 @@ pub async fn start_adapters<L: LifeCycle>(mut ctx: Context) -> Result<ReturnAdap
 pub async fn start<L: LifeCycle>() -> Result<()> {
     // create context
     let ctx = make_context().await?;
-    let logger = ctx.configs.logger.clone();
+    let conf = ctx.configs.clone().expect("load configuration failed.");
+    let logger = conf.logger.clone();
     let level = logger
         .enable
         .then(|| logger.level)
@@ -65,7 +67,7 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    print_logo(ctx.environment.clone(), ctx.configs.clone());
+    print_logo(ctx.environment.clone().unwrap(), conf.clone());
     println!("version: {}", L::version());
 
     // LifeCycle Adapters.
@@ -76,6 +78,7 @@ pub async fn start<L: LifeCycle>() -> Result<()> {
     for adapter in &adapters {
         router = adapter.after_route(&ctx, router).await?;
     }
+    tracing::info!(adapters = ?adapters.iter().map(|init| init.name()).collect::<Vec<_>>().join(","), "adapter invoke after route fn");
     // ports http serve
     hooks::serve::<L>(&ctx, router).await?;
     for adapter in &adapters {

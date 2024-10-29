@@ -31,7 +31,7 @@ pub trait LifeCycle {
     /// # Returns
     /// A Result indicating success () or an error if the server fails to start.
     async fn rest(ctx: &Context, app: Router) -> Result<()> {
-        let settings = ctx.configs.clone();
+        let settings = ctx.configs.clone().expect("load configuration failed.");
         let address = format!("{}:{}", settings.server.host, settings.server.port);
 
         let listener = tokio::net::TcpListener::bind(&address).await?;
@@ -61,7 +61,7 @@ pub async fn serve<L: LifeCycle>(ctx: &Context, router: Router) -> Result<()> {
 }
 
 pub async fn build_routes<L: LifeCycle>(ctx: &Context) -> Result<Router> {
-    let config = ctx.configs.clone();
+    let config = ctx.configs.clone().expect("load configuration failed.");
     // build our application with a route
     let mut app = axum::Router::new()
         .merge(L::routes(ctx.clone()))

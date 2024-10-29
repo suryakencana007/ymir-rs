@@ -18,7 +18,7 @@ static DEFAULT_IDENT_HEADER_VALUE: LazyLock<http::header::HeaderValue> =
     LazyLock::new(|| http::header::HeaderValue::from_static("butter"));
 
 pub fn interception_fn(ctx: Context, mut router: Router) -> Router {
-    let cfg = ctx.configs.clone();
+    let cfg = ctx.configs.clone().expect("load configuration failed.");
 
     // CORS Middleware
     if let Some(cors) = cfg.server.interceptions.cors.as_ref().filter(|c| c.enable) {
@@ -67,7 +67,7 @@ pub fn interception_fn(ctx: Context, mut router: Router) -> Router {
     }
 
     // catch panic
-    match ctx.environment.clone() {
+    match ctx.environment.unwrap() {
         Environment::Development => {
             router = router.layer(CatchPanicLayer::custom(handle_panic));
         }
