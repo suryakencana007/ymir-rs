@@ -2,6 +2,9 @@
 members = ["examples/demo", "ymir-openapi"]
 resolver = "2"
 
+[workspace.metadata.publish]
+order = [".", "ymir-openapi"]
+
 [workspace.package]
 repository = "https://github.com/suryakencana007/ymir-rs"
 license = "MIT"

@@ -12,7 +12,7 @@ use serde::Serialize;
 use serde_json::Value;
 use utoipa::openapi::{HttpMethod, OpenApi};
 
-const DEFAULT_HTML: &str = include_str!("../assets/swagger.html");
+const DEFAULT_HTML: &str = include_str!("./assets/swagger.html");
 
 #[derive(Clone)]
 pub struct Swagger<S: Spec> {
