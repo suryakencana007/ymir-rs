@@ -1,6 +1,10 @@
 [package]
 name = "ymir-openapi"
 version = "0.3.0"
+description = "Build OpenApi documentation with swagger ui in Ymir."
+homepage = "https://github.com/suryakencana007/ymir-rs"
+categories = ["development-tools", "web-programming"]
+keywords = ["swagger-ui", "rest", "openapi"]
 repository.workspace = true
 license.workspace = true
 edition.workspace = true
