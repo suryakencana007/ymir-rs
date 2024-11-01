@@ -1,7 +1,13 @@
 use async_trait::async_trait;
-use axum::Router;
-use ymir::{adapter::Adapter, context::Context, hooks::LifeCycle, Result};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Router,
+};
+use ymir::{adapter::Adapter, context::Context, hooks::LifeCycle, responses::Success, Result};
 use ymir_openapi::prelude::*;
+
+use crate::adapters::cache::Cache;
 
 pub struct App;
 #[async_trait]
@@ -25,6 +31,9 @@ impl LifeCycle for App {
     }
 
     fn routes(ctx: Context) -> Router {
+        let kunci = Kunci {
+            label: String::from("kunci itu ada disini"),
+        };
         RouterDoc::new()
             .build_doc("/api/swagger", |mut doc| {
                 doc.info = openapi::Info::new(
@@ -40,6 +49,7 @@ impl LifeCycle for App {
                 "/api/health-check-one",
                 axum::routing::get(|| async { "OK" }),
             )
+            .layer(Cache(kunci))
             .with_state(ctx)
     }
 }
@@ -49,9 +59,19 @@ impl LifeCycle for App {
     path = "/health",
      tag = "api",
     responses(
-        (status = OK, description = "Success", body = str)
+        (status = OK, description = "Success", body = ymir::responses::Success),
+        (status = 400, description = "Bad Request", body = ymir::errors::ErrorResponse)
     )
 )]
-pub async fn health() -> &'static str {
-    "OK"
+pub async fn health(Cache(k): Cache<Kunci>) -> Result<Response> {
+    Ok(Success {
+        message: k.label.to_string(),
+        status_code: StatusCode::OK.as_u16(),
+    }
+    .into_response())
+}
+
+#[derive(Clone)]
+pub struct Kunci {
+    pub label: String,
 }

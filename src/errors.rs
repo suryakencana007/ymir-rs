@@ -8,6 +8,7 @@ use axum::{
 };
 use http::StatusCode;
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use crate::responses::Json;
 
@@ -84,9 +85,9 @@ impl Error {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 /// Structure representing details about an error.
-struct ErrorResponse {
+pub struct ErrorResponse {
     message: String,
     status_code: u16,
 }

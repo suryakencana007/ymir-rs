@@ -6,6 +6,7 @@ pub mod health;
 pub mod hooks;
 pub mod interception;
 pub(crate) mod logo;
+pub mod prelude;
 pub mod render;
 pub mod responses;
 pub mod signal;

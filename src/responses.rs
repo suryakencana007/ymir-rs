@@ -1,10 +1,12 @@
+use std::borrow::Cow;
+
 use axum::{
     extract::FromRequest,
     response::{IntoResponse, Response},
 };
 use http::StatusCode;
-use rusty_ulid::Ulid;
 use serde::Serialize;
+use utoipa::{PartialSchema, ToSchema};
 
 use crate::errors::Error;
 
@@ -21,11 +23,27 @@ where
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct Success {
     pub message: String,
     pub status_code: u16,
-    pub user_id: Option<Ulid>,
+}
+
+#[derive(Serialize)]
+pub struct UlidSchema(pub rusty_ulid::Ulid);
+
+impl PartialSchema for UlidSchema {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::schema::Object::builder()
+            .schema_type(utoipa::openapi::schema::SchemaType::AnyValue)
+            .into()
+    }
+}
+
+impl ToSchema for UlidSchema {
+    fn name() -> std::borrow::Cow<'static, str> {
+        Cow::Borrowed("UlidSchema")
+    }
 }
 
 impl Default for Success {
@@ -33,7 +51,6 @@ impl Default for Success {
         Self {
             message: "Success".to_string(),
             status_code: StatusCode::OK.as_u16(),
-            user_id: None,
         }
     }
 }
