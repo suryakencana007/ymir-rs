@@ -1,1 +1,1 @@
-pub use rusty_ulid::{self, DecodingError, Ulid};
+pub use ulid::{self, Ulid};

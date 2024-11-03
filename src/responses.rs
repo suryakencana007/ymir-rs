@@ -1,12 +1,10 @@
-use std::borrow::Cow;
-
 use axum::{
     extract::FromRequest,
     response::{IntoResponse, Response},
 };
 use http::StatusCode;
 use serde::Serialize;
-use utoipa::{PartialSchema, ToSchema};
+use utoipa::ToSchema;
 
 use crate::errors::Error;
 
@@ -23,29 +21,6 @@ where
     }
 }
 
-#[derive(Serialize, ToSchema)]
-pub struct Success {
-    pub message: String,
-    pub status_code: u16,
-}
-
-#[derive(Serialize)]
-pub struct UlidSchema(pub rusty_ulid::Ulid);
-
-impl PartialSchema for UlidSchema {
-    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
-        utoipa::openapi::schema::Object::builder()
-            .schema_type(utoipa::openapi::schema::SchemaType::AnyValue)
-            .into()
-    }
-}
-
-impl ToSchema for UlidSchema {
-    fn name() -> std::borrow::Cow<'static, str> {
-        Cow::Borrowed("UlidSchema")
-    }
-}
-
 impl Default for Success {
     fn default() -> Self {
         Self {
@@ -57,15 +32,18 @@ impl Default for Success {
 
 impl IntoResponse for Success {
     fn into_response(self) -> Response {
-        let status = StatusCode::from_u16(self.status_code).unwrap_or(StatusCode::OK);
-        let json_body = axum::Json(self);
+        (self.status(), axum::Json(self).into_response()).into_response()
+    }
+}
 
-        // Convert Json to Response
-        let mut response = json_body.into_response();
+#[derive(Serialize, ToSchema)]
+pub struct Success {
+    pub message: String,
+    pub status_code: u16,
+}
 
-        // Set the correct status code
-        *response.status_mut() = status;
-
-        response
+impl Success {
+    pub fn status(&self) -> StatusCode {
+        StatusCode::from_u16(self.status_code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
     }
 }

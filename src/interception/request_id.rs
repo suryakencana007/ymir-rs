@@ -48,5 +48,5 @@ fn make_request_id(maybe_request_id: Option<HeaderValue>) -> String {
             });
             id.filter(|s| !s.is_empty())
         })
-        .unwrap_or_else(|| rusty_ulid::Ulid::generate().to_string())
+        .unwrap_or_else(|| ulid::Ulid::new().to_string())
 }

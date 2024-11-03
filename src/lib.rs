@@ -12,5 +12,6 @@ pub mod responses;
 pub mod signal;
 pub mod startup;
 pub mod state;
+pub mod types;
 
 pub type Result<T, E = errors::Error> = std::result::Result<T, E>;

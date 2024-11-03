@@ -30,7 +30,7 @@ pub enum Error {
     PasswordHashError(#[from] argon2::password_hash::Error),
 
     #[error(transparent)]
-    UlidError(#[from] rusty_ulid::DecodingError),
+    UlidError(#[from] ulid::DecodeError),
 
     #[error(transparent)]
     JSON(serde_json::Error),
