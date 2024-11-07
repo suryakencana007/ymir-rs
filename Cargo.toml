@@ -1,72 +1,43 @@
 [workspace]
-members = ["examples/demo", "ymir-openapi"]
 resolver = "2"
-
-[workspace.metadata.publish]
-order = [".", "ymir-openapi"]
+members = [ "examples/adaptor","examples/simple", "ymir", "ymir-openapi"]
+exclude = ["examples"]
 
 [workspace.package]
-repository = "https://github.com/suryakencana007/ymir-rs"
-license = "MIT"
+version = "0.3.0"
 edition = "2021"
-rust-version = "1.80.0"
-include = ["src/**/*", "Cargo.toml", "LICENSE*", "README.md"]
+license = "MIT"
+repository = "https://github.com/suryakencana007/ymir-rs"
 
-[package]
-name = "ymir"
-version = "0.2.3"
-authors = ["Nanang Suryadi <nanang.jobs@gmail.com>"]
-description = "Core library for building scalable application using rust."
-homepage = "https://github.com/suryakencana007/ymir-rs"
-categories = ["development-tools", "web-programming"]
-keywords = ["boilerplate", "library", "rest", "api"]
-repository.workspace = true
-license.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-include.workspace = true
+[workspace.dependencies]
+ymir = { path = "ymir", version = "0.3.0" }
 
-[dependencies]
 # async
 async-trait = "0.1.83"
-tokio = { version = "1.40.0", features = [
-    "macros",
-    "rt-multi-thread",
-    "signal",
-] }
+tokio = { version = "1.40.0", default-features = false }
 
 # serialize
-serde = { version = "1.0.210", features = ["derive"] }
+serde = { version = "1.0.210", default-features = false }
 serde_json = "1.0.128"
 
 # rest
-axum = { version = "0.8.0-alpha.1", features = ["macros"] }
-axum-extra = { version = "0.10.0-alpha.1", features = [
-    "cookie",
-    "typed-header",
-] }
+axum = "0.8.0-alpha.1"
+axum-extra = { version = "0.10.0-alpha.1", default-features = false }
 http = "1.1.0"
-tower = { version = "0.5.1", features = ["util"] }
-tower-http = { version = "0.6.1", features = [
-    "catch-panic",
-    "compression-full",
-    "cors",
-    "fs",
-    "set-header",
-    "timeout",
-    "trace",
-] }
+tower = { version = "0.5.1", default-features = false }
+tower-http = { version = "0.6.1", default-features = false }
 
 # utils
-argon2 = { version = "0.5.3", features = ["std"] }
+argon2 = { version = "0.5.3", default-features = false }
 byte-unit = "5.1.4"
-config = { version = "0.14.0", features = ["yaml"] }
+config = { version = "0.14.0", default-features = false }
 colored = "2.1.0"
 regex = "1.11.0"
-ulid = { version = "1.1.3", features = ["rand", "uuid", "serde"] }
+ulid = { version = "1.1.3", default-features = false }
 thiserror = "1.0.64"
 tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber = "0.3.18"
 tower-layer = "0.3.3"
 dotenvy = "0.15.7"
-utoipa = { version = "5.1.2", features = ["macros"] }
+utoipa = { version = "5.1.2", default-features = false }
+paste = "1.0.15"

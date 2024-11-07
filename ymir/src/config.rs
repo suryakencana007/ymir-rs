@@ -118,7 +118,7 @@ pub struct Secret {
 }
 
 /// The possible runtime environment for our application.
-#[derive(Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub enum Environment {
     #[serde(rename = "development")]
     Development,
@@ -212,4 +212,98 @@ pub fn load_configuration(environment: &Environment) -> Result<Config, config::C
         )
         .build()?;
     cfg.try_deserialize::<Config>()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_interception_cors() {
+        let cors = InterceptionCors {
+            enable: true,
+            allow_origins: Some(vec!["https://example.com".to_string()]),
+            allow_headers: Some(vec!["Content-Type".to_string()]),
+            allow_methods: Some(vec!["GET".to_string()]),
+            max_age: Some(3600),
+        };
+
+        assert!(cors.enable);
+        assert_eq!(
+            cors.allow_origins,
+            Some(vec!["https://example.com".to_string()])
+        );
+        assert_eq!(cors.allow_headers, Some(vec!["Content-Type".to_string()]));
+        assert_eq!(cors.allow_methods, Some(vec!["GET".to_string()]));
+        assert_eq!(cors.max_age, Some(3600));
+    }
+
+    #[test]
+    fn test_interception_compression() {
+        let compression = InterceptionCompression { enable: true };
+        assert!(compression.enable);
+    }
+
+    #[test]
+    fn test_interception_timeout_request() {
+        let timeout = InterceptionTimeoutRequest {
+            enable: true,
+            timeout: 10000,
+        };
+        assert!(timeout.enable);
+        assert_eq!(timeout.timeout, 10000);
+    }
+
+    #[test]
+    fn test_interception_limit_payload() {
+        let limit_payload = InterceptionLimitPayload {
+            enable: true,
+            body_limit: "5mb".to_string(),
+        };
+        assert!(limit_payload.enable);
+        assert_eq!(limit_payload.body_limit, "5mb");
+    }
+
+    #[test]
+    fn test_interception_static_assets() {
+        let static_assets = InterceptionStaticAssets {
+            enable: true,
+            must_exist: true,
+            folder: InterceptionFolderAssets {
+                uri: "/static".to_string(),
+                path: "./static".to_string(),
+            },
+            fallback: "/index.html".to_string(),
+            precompressed: true,
+        };
+        assert!(static_assets.enable);
+        assert!(static_assets.must_exist);
+        assert_eq!(static_assets.folder.uri, "/static");
+        assert_eq!(static_assets.folder.path, "./static");
+        assert_eq!(static_assets.fallback, "/index.html");
+        assert!(static_assets.precompressed);
+    }
+
+    #[test]
+    fn test_environment_try_from() {
+        assert_eq!(
+            Environment::try_from("development".to_string()).unwrap(),
+            Environment::Development
+        );
+        assert_eq!(
+            Environment::try_from("production".to_string()).unwrap(),
+            Environment::Production
+        );
+        assert!(Environment::try_from("invalid".to_string()).is_err());
+    }
+
+    #[test]
+    fn test_load_configuration() {
+        let config = load_configuration(&Environment::Development).unwrap();
+        assert_eq!(config.server.port, 5050);
+        assert_eq!(config.server.host, "127.0.0.1".to_string());
+        assert_eq!(config.server.base_url, "http://127.0.0.1".to_string());
+        assert_eq!(config.server.protocol, "http".to_string());
+        assert_eq!(config.logger.level, "debug".to_string());
+    }
 }

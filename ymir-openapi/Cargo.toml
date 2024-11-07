@@ -5,20 +5,18 @@ description = "Build OpenApi documentation with swagger ui in Ymir."
 homepage = "https://github.com/suryakencana007/ymir-rs"
 categories = ["development-tools", "web-programming"]
 keywords = ["swagger-ui", "rest", "openapi"]
-repository.workspace = true
-license.workspace = true
 edition.workspace = true
-rust-version.workspace = true
-include.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
-axum = { version = "0.8.0-alpha.1" }
-paste = "1.0.15"
-serde = { version = "1.0.213", features = ["derive"] }
-serde_json = "1.0.132"
-utoipa = { version = "5.1.2", default-features = false, features = ["macros"] }
+ymir = { workspace = true }
 
-ymir = "0.2.1"
+axum = { workspace = true }
+paste = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+utoipa = { workspace = true, features = ["macros"] }
 
 [dev-dependencies]
 ymir-openapi = { path = "." }

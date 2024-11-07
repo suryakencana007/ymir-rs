@@ -102,9 +102,11 @@ impl ErrorResponse {
     }
 }
 /// ```rust
+/// use axum::response::Response;
+/// use ymir::errors::Error;
 ///
-/// async fn get_hello() -> Result<Response> {
-///     Err(Error::NotFound(msg.into()))
+/// async fn get_hello() -> Result<Response, Error> {
+///     Err(Error::NotFound("ok".to_string()))
 /// }
 /// ````
 impl IntoResponse for Error {

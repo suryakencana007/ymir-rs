@@ -1,0 +1,63 @@
+server:
+  protocol: http
+  host: 127.0.0.1
+  base_url: "http://127.0.0.1"
+  # Out of the box middleware configuration. to disable middleware you can changed the `enable` field to `false` of comment the middleware block
+  interceptions:
+    cors:
+      enable: true
+      # Set the value of the [`Access-Control-Allow-Origin`][mdn] header
+      allow_origins:
+        - http://localhost:5050
+      #   - https://loco.rs
+      # Set the value of the [`Access-Control-Allow-Headers`][mdn] header
+      allow_headers:
+        - Content-Type
+        - Origin
+        - Accept
+        - Authorization
+      # Set the value of the [`Access-Control-Allow-Methods`][mdn] header
+      allow_methods:
+        - OPTIONS
+        - POST
+        - GET
+        - PUT
+        - DELETE
+      # Set the value of the [`Access-Control-Max-Age`][mdn] header in seconds
+      # max_age: 3600
+    compression:
+      # Enable/Disable the middleware.
+      enable: true
+      # Allows to limit the payload size request. payload that bigger than this file will blocked the request.
+    limit_payload:
+      # Enable/Disable the middleware.
+      enable: true
+      # the limit size. can be b,kb,kib,mb,mib,gb,gib
+      body_limit: 7mb
+    # Timeout for incoming requests middleware. requests that take more time from the configuration will cute and 408 status code will returned.
+    timeout_request:
+      # Enable/Disable the middleware.
+      enable: true
+      # Duration time in milliseconds.
+      timeout: 5000
+    static_assets:
+      enable: true
+      must_exist: true
+      precompressed: true
+      folder:
+        path: assets
+      fallback: index.html
+
+frontend_url: "http://localhost:3000"
+
+secret:
+  cookie: 3bbefd8d24c89aefd3ad0b8b95afd2ea996e47b89d93d4090b481a091b4e73e5543305f2e831d0b47737d9807a1b5b5773dba3bbb63623bd42de84389fbfa3d1
+  token_expiration: 15
+  cookie_expiration: 1440
+
+logger:
+  # Enable or disable logging.
+  enable:
+    true
+    # Log level, options: trace, debug, info, warn or error.
+  level: debug

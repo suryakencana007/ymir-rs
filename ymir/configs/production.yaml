@@ -1,0 +1,12 @@
+server:
+  protocol: https
+  host: 0.0.0.0
+  base_url: ""
+
+debug: false
+
+secret:
+  token_expiration: 15
+  cookie_expiration: 1440
+
+frontend_url: ""

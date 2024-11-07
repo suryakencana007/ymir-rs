@@ -3,7 +3,7 @@ pub mod config;
 pub mod context;
 pub mod errors;
 pub mod health;
-pub mod hooks;
+pub mod hook;
 pub mod interception;
 pub(crate) mod logo;
 pub mod prelude;

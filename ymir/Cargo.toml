@@ -1,0 +1,48 @@
+[package]
+name = "ymir"
+version = "0.3.0"
+authors = ["Nanang Suryadi <nanang.jobs@gmail.com>"]
+description = "Core library for building scalable application using rust."
+categories = ["development-tools", "web-programming"]
+keywords = ["boilerplate", "library", "rest", "api"]
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# async
+async-trait = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
+
+# serialize
+serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+
+# rest
+axum = { workspace = true, features = ["macros"] }
+axum-extra = { workspace = true, features = ["cookie", "typed-header"] }
+http = { workspace = true }
+tower = { workspace = true, features = ["util"] }
+tower-http = { workspace = true, features = [
+    "catch-panic",
+    "compression-full",
+    "cors",
+    "fs",
+    "set-header",
+    "timeout",
+    "trace",
+] }
+
+# utils
+argon2 = { workspace = true, features = ["std"] }
+byte-unit = { workspace = true }
+config = { workspace = true, features = ["yaml"] }
+colored = { workspace = true }
+regex = { workspace = true }
+ulid = { workspace = true, features = ["std", "uuid", "serde"] }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tower-layer = { workspace = true }
+dotenvy = { workspace = true }
+utoipa = { workspace = true, features = ["macros"] }

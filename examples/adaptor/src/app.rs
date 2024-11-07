@@ -2,12 +2,14 @@ use async_trait::async_trait;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    Router,
+    Extension, Router,
 };
-use ymir::{adapter::Adapter, context::Context, hooks::LifeCycle, responses::Success, Result};
+use ymir::{
+    adapter::Adapter, context::Context, health, hook::LifeCycle, responses::Success, Result,
+};
 use ymir_openapi::prelude::*;
 
-use crate::adapters::cache::Cache;
+use crate::adapters::metrics::MetricsAdapter;
 
 pub struct App;
 #[async_trait]
@@ -27,7 +29,7 @@ impl LifeCycle for App {
     }
 
     async fn adapters() -> Result<Vec<Box<dyn Adapter>>> {
-        Ok(vec![])
+        Ok(vec![Box::new(MetricsAdapter::new("/metrics".to_string()))])
     }
 
     fn routes(ctx: Context) -> Router {
@@ -37,19 +39,20 @@ impl LifeCycle for App {
         RouterDoc::new()
             .build_doc("/api/swagger", |mut doc| {
                 doc.info = openapi::Info::new(
-                    "Demo Ymir API DOC",
+                    "Metric Adapter",
                     &format!("v{}", env!("CARGO_PKG_VERSION")),
                 );
 
                 doc.info.description = Some("Demo YMIR OPENAPI UI".to_string());
                 doc
             })
+            .routes(routes!(health::healthz))
             .routes(routes!(health))
             .route(
                 "/api/health-check-one",
                 axum::routing::get(|| async { "OK" }),
             )
-            .layer(Cache(kunci))
+            .layer(Extension(kunci))
             .with_state(ctx)
     }
 }
@@ -63,7 +66,7 @@ impl LifeCycle for App {
         (status = 400, description = "Bad Request", body = ymir::errors::ErrorResponse)
     )
 )]
-pub async fn health(Cache(k): Cache<Kunci>) -> Result<Response> {
+pub async fn health(Extension(k): Extension<Kunci>) -> Result<Response> {
     Ok(Success {
         message: k.label.to_string(),
         status_code: StatusCode::OK.as_u16(),
